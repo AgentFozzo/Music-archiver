@@ -2,6 +2,10 @@ import { usePlayerStore } from '../../store/playerStore';
 import { api } from '../../api/client';
 import { formatDuration } from '../../utils/format';
 import ArtworkImage from '../common/ArtworkImage';
+import {
+  IconShuffle, IconPrev, IconPlay, IconPause, IconNext, IconRepeat,
+  IconVolumeOff, IconVolumeLow, IconVolumeHigh,
+} from '../common/Icons';
 import styles from './PlayerBar.module.css';
 
 export default function PlayerBar() {
@@ -60,27 +64,27 @@ export default function PlayerBar() {
             onClick={toggleShuffle}
             title="Shuffle"
           >
-            ⇌
+            <IconShuffle size={15} />
           </button>
           <button className={`${styles.btn} ${styles.btnMd}`} onClick={prev} title="Previous">
-            ⏮
+            <IconPrev size={18} />
           </button>
           <button
             className={`${styles.btn} ${styles.btnPlay}`}
             onClick={togglePlay}
             title={isPlaying ? 'Pause' : 'Play'}
           >
-            {isPlaying ? '⏸' : '▶'}
+            {isPlaying ? <IconPause size={18} /> : <IconPlay size={18} />}
           </button>
           <button className={`${styles.btn} ${styles.btnMd}`} onClick={next} title="Next">
-            ⏭
+            <IconNext size={18} />
           </button>
           <button
             className={`${styles.btn} ${isRepeat ? styles.active : ''}`}
             onClick={toggleRepeat}
             title="Repeat"
           >
-            ↻
+            <IconRepeat size={15} />
           </button>
         </div>
 
@@ -98,7 +102,7 @@ export default function PlayerBar() {
       {/* Volume */}
       <div className={styles.volume}>
         <span className={styles.volumeIcon}>
-          {volume === 0 ? '🔇' : volume < 0.5 ? '🔉' : '🔊'}
+          {volume === 0 ? <IconVolumeOff size={16} /> : volume < 0.5 ? <IconVolumeLow size={16} /> : <IconVolumeHigh size={16} />}
         </span>
         <input
           type="range"

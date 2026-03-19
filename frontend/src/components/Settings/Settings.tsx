@@ -100,7 +100,7 @@ export default function Settings() {
           {updating ? (
             <><span className={styles.spinner} /> Updating…</>
           ) : (
-            '↑ Update Now'
+            'Update Now'
           )}
         </button>
       </div>

@@ -1,23 +1,27 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useState, useRef } from 'react';
 import { api } from '../../api/client';
+import {
+  IconLibrary, IconSongs, IconAlbums, IconArtists,
+  IconSettings, IconSearch, IconRefresh,
+} from '../common/Icons';
 import styles from './Sidebar.module.css';
 
 interface NavItem {
   to: string;
   label: string;
-  icon: string;
+  Icon: React.ComponentType<{ size?: number }>;
 }
 
 const navItems: NavItem[] = [
-  { to: '/', label: 'Library', icon: '♪' },
-  { to: '/songs', label: 'Songs', icon: '♫' },
-  { to: '/albums', label: 'Albums', icon: '⬛' },
-  { to: '/artists', label: 'Artists', icon: '👤' },
+  { to: '/',        label: 'Library', Icon: IconLibrary },
+  { to: '/songs',   label: 'Songs',   Icon: IconSongs   },
+  { to: '/albums',  label: 'Albums',  Icon: IconAlbums  },
+  { to: '/artists', label: 'Artists', Icon: IconArtists },
 ];
 
 const bottomNavItems: NavItem[] = [
-  { to: '/settings', label: 'Settings', icon: '⚙' },
+  { to: '/settings', label: 'Settings', Icon: IconSettings },
 ];
 
 export default function Sidebar() {
@@ -47,7 +51,7 @@ export default function Sidebar() {
     <aside className={styles.sidebar}>
       {/* Logo / App name */}
       <div className={styles.logo}>
-        <span className={styles.logoIcon}>♪</span>
+        <IconLibrary size={20} />
         <span className={styles.logoText}>Music</span>
       </div>
 
@@ -67,7 +71,7 @@ export default function Sidebar() {
           </form>
         ) : (
           <button className={styles.searchBtn} onClick={() => setSearching(true)}>
-            <span>⌕</span>
+            <IconSearch size={14} />
             <span className={styles.searchLabel}>Search</span>
           </button>
         )}
@@ -85,7 +89,7 @@ export default function Sidebar() {
               `${styles.navItem} ${isActive ? styles.active : ''}`
             }
           >
-            <span className={styles.navIcon}>{item.icon}</span>
+            <span className={styles.navIcon}><item.Icon size={16} /></span>
             <span className={styles.navLabel}>{item.label}</span>
           </NavLink>
         ))}
@@ -104,7 +108,7 @@ export default function Sidebar() {
               `${styles.navItem} ${isActive ? styles.active : ''}`
             }
           >
-            <span className={styles.navIcon}>{item.icon}</span>
+            <span className={styles.navIcon}><item.Icon size={16} /></span>
             <span className={styles.navLabel}>{item.label}</span>
           </NavLink>
         ))}
@@ -113,7 +117,7 @@ export default function Sidebar() {
       {/* Actions */}
       <div className={styles.actions}>
         <button className={styles.scanBtn} onClick={handleScan} title="Rescan library">
-          <span>↻</span>
+          <IconRefresh size={16} />
           <span className={styles.navLabel}>Scan Library</span>
         </button>
       </div>

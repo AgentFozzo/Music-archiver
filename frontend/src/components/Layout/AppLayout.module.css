@@ -6,6 +6,7 @@
     "sidebar main"
     "player  player";
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background: var(--color-bg);
 }
@@ -34,7 +35,7 @@
 @media (max-width: 640px) {
   .root {
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr var(--player-height) 60px;
+    grid-template-rows: 1fr var(--player-height) calc(60px + env(safe-area-inset-bottom, 0px));
     grid-template-areas:
       "main"
       "player"
