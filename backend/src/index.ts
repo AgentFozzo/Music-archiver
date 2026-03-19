@@ -14,6 +14,7 @@ import recommendationsRouter from './routes/recommendations';
 import historyRouter from './routes/history';
 import scannerRouter from './routes/scanner';
 import playlistsRouter from './routes/playlists';
+import settingsRouter from './routes/settings';
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
@@ -43,6 +44,7 @@ app.use('/api/recommendations', recommendationsRouter);
 app.use('/api/history', historyRouter);
 app.use('/api/scan', scannerRouter);
 app.use('/api/playlists', playlistsRouter);
+app.use('/api/settings', settingsRouter);
 
 // Serve frontend static files
 const publicDir = path.join(__dirname, '..', 'public');

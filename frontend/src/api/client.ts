@@ -60,6 +60,18 @@ export const api = {
 
   scan: () => post<{ ok: boolean; message: string }>('/scan', {}),
 
+  settings: {
+    info: () => get<{
+      commit: string;
+      branch: string;
+      remote: string | null;
+      nodeVersion: string;
+      uptime: number;
+      gitRemoteConfigured: boolean;
+    }>('/settings/info'),
+    update: () => post<{ updated: boolean; message: string; output?: string; error?: string }>('/settings/update', {}),
+  },
+
   streamUrl: (trackId: string) => `${BASE}/stream/${trackId}`,
   artworkUrl: (albumId: string) => `${BASE}/artwork/album/${albumId}`,
   trackArtworkUrl: (trackId: string) => `${BASE}/artwork/track/${trackId}`,

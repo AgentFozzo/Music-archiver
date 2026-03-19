@@ -16,6 +16,10 @@ const navItems: NavItem[] = [
   { to: '/artists', label: 'Artists', icon: '👤' },
 ];
 
+const bottomNavItems: NavItem[] = [
+  { to: '/settings', label: 'Settings', icon: '⚙' },
+];
+
 export default function Sidebar() {
   const [searching, setSearching] = useState(false);
   const [query, setQuery] = useState('');
@@ -89,6 +93,22 @@ export default function Sidebar() {
 
       {/* Spacer */}
       <div className={styles.spacer} />
+
+      {/* Bottom nav (Settings) */}
+      <nav className={styles.nav}>
+        {bottomNavItems.map(item => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            className={({ isActive }) =>
+              `${styles.navItem} ${isActive ? styles.active : ''}`
+            }
+          >
+            <span className={styles.navIcon}>{item.icon}</span>
+            <span className={styles.navLabel}>{item.label}</span>
+          </NavLink>
+        ))}
+      </nav>
 
       {/* Actions */}
       <div className={styles.actions}>

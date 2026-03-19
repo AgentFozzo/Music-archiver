@@ -8,6 +8,7 @@ import ArtistsList from './components/Artists/ArtistsList';
 import ArtistDetail from './components/Artists/ArtistDetail';
 import SearchResults from './components/Search/SearchResults';
 import PlaylistDetail from './components/Playlists/PlaylistDetail';
+import Settings from './components/Settings/Settings';
 import { useAudio } from './hooks/useAudio';
 
 export default function App() {
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/artists/:id" element={<ArtistDetail />} />
         <Route path="/search" element={<SearchResults />} />
         <Route path="/playlists/:id" element={<PlaylistDetail />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </AppLayout>
   );

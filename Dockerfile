@@ -1,37 +1,35 @@
-# Stage 1: Build backend
-FROM node:20-alpine AS backend-build
-WORKDIR /app/backend
-COPY backend/package*.json ./
-RUN npm install
-COPY backend/ ./
-RUN npm run build && cp src/database/schema.sql dist/database/schema.sql
+FROM node:20-alpine
 
-# Stage 2: Build frontend
-FROM node:20-alpine AS frontend-build
-WORKDIR /app/frontend
-COPY frontend/package*.json ./
-RUN npm install
-COPY frontend/ ./
-RUN npm run build
+# git is required for the self-update endpoint
+RUN apk add --no-cache git
 
-# Stage 3: Final image
-FROM node:20-alpine AS final
 WORKDIR /app
 
-# Install production backend dependencies
-COPY backend/package*.json ./
-RUN npm install --omit=dev
+# ── Backend dependencies ──────────────────────────────────────────────────────
+COPY backend/package*.json ./backend/
+RUN cd backend && npm install
 
-# Copy compiled backend
-COPY --from=backend-build /app/backend/dist ./dist
+# ── Frontend dependencies ─────────────────────────────────────────────────────
+COPY frontend/package*.json ./frontend/
+RUN cd frontend && npm install
 
-# Copy frontend build (served as static files)
-COPY --from=frontend-build /app/backend/public ./public
+# ── Build backend ─────────────────────────────────────────────────────────────
+COPY backend/ ./backend/
+RUN cd backend && npm run build && cp src/database/schema.sql dist/database/schema.sql
 
-# Create directories for volumes
+# ── Build frontend (outDir: ../backend/public via vite config) ────────────────
+COPY frontend/ ./frontend/
+RUN cd frontend && npm run build
+
+# ── Copy .git for self-update (git pull inside container) ────────────────────
+COPY .git .git
+
+# ── Runtime volumes ───────────────────────────────────────────────────────────
 RUN mkdir -p /music /data /artwork
 
-# Expose port
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
 EXPOSE 3000
 
 ENV NODE_ENV=production
@@ -39,5 +37,9 @@ ENV PORT=3000
 ENV MUSIC_DIR=/music
 ENV DB_PATH=/data/music.db
 ENV ARTWORK_DIR=/artwork
+# Set GIT_REMOTE at runtime to enable the Update button, e.g.:
+#   -e GIT_REMOTE=https://github.com/you/Music-archiver
+#   -e GIT_BRANCH=main   (defaults to current branch)
 
-CMD ["node", "dist/index.js"]
+WORKDIR /app/backend
+CMD ["/docker-entrypoint.sh"]
