@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { spawnSync } from 'child_process';
+import fs from 'fs';
 
 const router = Router();
 
@@ -9,29 +10,53 @@ function git(...args: string[]) {
   return spawnSync('git', ['-C', REPO, ...args], { encoding: 'utf-8' });
 }
 
+function gitAvailable() {
+  return spawnSync('git', ['--version'], { encoding: 'utf-8' }).status === 0;
+}
+
+function isGitRepo() {
+  return fs.existsSync(`${REPO}/.git`);
+}
+
 router.get('/info', (_req: Request, res: Response) => {
-  const commit  = git('rev-parse', '--short', 'HEAD').stdout?.trim() ?? 'unknown';
-  const branch  = git('rev-parse', '--abbrev-ref', 'HEAD').stdout?.trim() ?? 'unknown';
-  const remote  = git('remote', 'get-url', 'origin').stdout?.trim() ?? null;
+  const hasGit  = gitAvailable();
+  const hasRepo = isGitRepo();
+
+  const commit = hasGit && hasRepo ? (git('rev-parse', '--short', 'HEAD').stdout?.trim() || 'unknown') : 'n/a';
+  const branch = hasGit && hasRepo ? (git('rev-parse', '--abbrev-ref', 'HEAD').stdout?.trim() || 'unknown') : 'n/a';
 
   res.json({
     commit,
     branch,
-    remote: remote || null,
     nodeVersion: process.version,
     uptime: Math.floor(process.uptime()),
+    gitAvailable: hasGit,
+    gitRepoPresent: hasRepo,
     gitRemoteConfigured: !!process.env.GIT_REMOTE,
   });
 });
 
 router.post('/update', (req: Request, res: Response) => {
+  if (!gitAvailable()) {
+    return res.status(500).json({
+      error: 'git is not installed in this container. Rebuild the Docker image with the latest Dockerfile (it now uses a single-stage build that includes git).',
+    });
+  }
+
+  if (!isGitRepo()) {
+    return res.status(500).json({
+      error: 'No .git directory found at /app. Rebuild the Docker image — the latest Dockerfile copies the .git directory into the image so git pull can work.',
+    });
+  }
+
   const remote = process.env.GIT_REMOTE;
 
   if (!remote) {
     return res.status(400).json({
       error:
         'GIT_REMOTE is not set. Add -e GIT_REMOTE=<repo-url> to your docker run command. ' +
-        'For a local Gitea server use the Docker bridge IP, e.g. http://172.17.0.1:37507/git/user/repo',
+        'For a local Gitea server reachable from the container use the Docker bridge IP, ' +
+        'e.g. http://172.17.0.1:37507/git/user/repo',
     });
   }
 
@@ -51,9 +76,10 @@ router.post('/update', (req: Request, res: Response) => {
   const pull = git('pull', 'origin', branch);
 
   if (pull.status !== 0) {
+    const output = (pull.stderr || pull.stdout || '').trim();
     return res.status(500).json({
-      error: 'git pull failed',
-      output: (pull.stderr || pull.stdout || '').trim(),
+      error: `git pull origin ${branch} failed`,
+      output,
     });
   }
 

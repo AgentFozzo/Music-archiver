@@ -48,10 +48,7 @@ export default function Settings() {
 
       setTimeout(poll, 6000);
     } catch (err: unknown) {
-      const raw = err instanceof Error ? err.message : String(err);
-      const msg = raw.includes('400')
-        ? 'GIT_REMOTE is not configured. Add -e GIT_REMOTE=<repo-url> to your docker run command.'
-        : `Update failed: ${raw}`;
+      const msg = err instanceof Error ? err.message : String(err);
       setStatus({ type: 'error', msg });
       setUpdating(false);
     }

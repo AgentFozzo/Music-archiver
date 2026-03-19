@@ -14,7 +14,12 @@ async function post<T>(path: string, body: unknown): Promise<T> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`API error ${res.status}: ${path}`);
+  if (!res.ok) {
+    const json = await res.json().catch(() => null);
+    const detail = json?.error || json?.message || res.statusText;
+    const extra  = json?.output ? `\n${json.output}` : '';
+    throw new Error(`${detail}${extra}`);
+  }
   return res.json();
 }
 
