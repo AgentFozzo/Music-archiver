@@ -38,6 +38,8 @@ export const api = {
   artists: {
     list: () => get<{ artists: Artist[] }>('/artists'),
     get: (id: string) => get<Artist>(`/artists/${id}`),
+    normalize: () => post<{ merged: number }>('/artists/normalize', {}),
+    fetchMetadata: () => post<{ queued: number }>('/artists/fetch-metadata', {}),
   },
 
   playlists: {

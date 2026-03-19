@@ -19,9 +19,19 @@ function sanitize(str: string | null | undefined): string | null {
   return str.trim() || null;
 }
 
+export function extractPrimaryArtist(raw: string): string {
+  // Take first part when separated by semicolons (multi-artist tag separator)
+  const primary = raw.split(';')[0].trim();
+  // Strip "feat." / "ft." / "featuring" suffixes (with optional parens)
+  return primary
+    .replace(/\s*[\(\[]?\s*feat(?:uring|\.)\s+.+$/i, '')
+    .replace(/\s*[\(\[]?\s*ft\.\s+.+$/i, '')
+    .trim() || raw.trim();
+}
+
 function getOrCreateArtist(name: string): string {
   const db = getDb();
-  const normalized = name.trim();
+  const normalized = extractPrimaryArtist(name);
 
   const existing = db.prepare(
     'SELECT id FROM artists WHERE name = ?'

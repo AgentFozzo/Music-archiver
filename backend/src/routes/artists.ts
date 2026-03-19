@@ -1,5 +1,8 @@
 import { Router, Request, Response } from 'express';
+import { v4 as uuidv4 } from 'uuid';
 import { getDb } from '../database/db';
+import { fetchArtistBioFromLastFm } from '../services/musicbrainz';
+import { extractPrimaryArtist } from '../services/localMetadata';
 
 const router = Router();
 
@@ -27,6 +30,70 @@ router.get('/', (req: Request, res: Response) => {
   `).all();
 
   res.json({ artists });
+});
+
+// Merge compound artist records (e.g. "Artist feat. X", "Artist; X") into their primary artist
+router.post('/normalize', (req: Request, res: Response) => {
+  const db = getDb();
+
+  const compounds = db.prepare(`
+    SELECT id, name FROM artists
+    WHERE name LIKE '%;%'
+       OR name LIKE '%feat.%'
+       OR name LIKE '%feat %'
+       OR name LIKE '%ft.%'
+       OR name LIKE '%featuring %'
+  `).all() as Array<{ id: string; name: string }>;
+
+  let merged = 0;
+
+  for (const compound of compounds) {
+    const primaryName = extractPrimaryArtist(compound.name);
+    if (primaryName === compound.name) continue;
+
+    let primary = db.prepare('SELECT id FROM artists WHERE name = ?').get(primaryName) as { id: string } | undefined;
+    if (!primary) {
+      const newId = uuidv4();
+      db.prepare('INSERT INTO artists (id, name) VALUES (?, ?)').run(newId, primaryName);
+      primary = { id: newId };
+    }
+
+    db.prepare('UPDATE tracks SET artist_id = ? WHERE artist_id = ?').run(primary.id, compound.id);
+    db.prepare('UPDATE albums SET artist_id = ? WHERE artist_id = ?').run(primary.id, compound.id);
+    db.prepare('DELETE FROM artists WHERE id = ?').run(compound.id);
+    merged++;
+  }
+
+  // Recompute album counts
+  db.prepare(`
+    UPDATE albums SET total_tracks = (SELECT COUNT(*) FROM tracks WHERE album_id = albums.id)
+  `).run();
+
+  res.json({ merged });
+});
+
+// Fetch Last.fm bio + image for artists missing metadata
+router.post('/fetch-metadata', async (req: Request, res: Response) => {
+  const apiKey = process.env.LASTFM_API_KEY;
+  if (!apiKey) return res.status(400).json({ error: 'LASTFM_API_KEY not configured' });
+
+  const db = getDb();
+  const artists = db.prepare(
+    'SELECT id, name FROM artists WHERE bio IS NULL OR image_url IS NULL LIMIT 100'
+  ).all() as Array<{ id: string; name: string }>;
+
+  res.json({ queued: artists.length });
+
+  // Run in background after responding
+  (async () => {
+    for (const artist of artists) {
+      try {
+        await fetchArtistBioFromLastFm(artist.id, artist.name, apiKey);
+        await new Promise(r => setTimeout(r, 250));
+      } catch { /* ignore individual failures */ }
+    }
+    console.log(`Artist metadata fetch complete: ${artists.length} artists processed`);
+  })();
 });
 
 router.get('/:id', (req: Request, res: Response) => {
