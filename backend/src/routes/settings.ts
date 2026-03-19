@@ -77,8 +77,17 @@ router.post('/update', (req: Request, res: Response) => {
 
   if (pull.status !== 0) {
     const output = (pull.stderr || pull.stdout || '').trim();
+    let hint = '';
+    if (output.includes('Could not connect') || output.includes('Failed to connect') || output.includes('Connection refused')) {
+      hint =
+        '\n\nThe container cannot reach the git server. If you are using a local Gitea instance, ' +
+        'find the correct Docker bridge IP by running on the host:\n' +
+        '  ip route show | grep docker\n' +
+        'or:  docker network inspect bridge | grep Gateway\n' +
+        'Then restart the container with -e GIT_REMOTE=http://<bridge-ip>:<port>/...';
+    }
     return res.status(500).json({
-      error: `git pull origin ${branch} failed`,
+      error: `git pull origin ${branch} failed${hint}`,
       output,
     });
   }
