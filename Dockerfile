@@ -4,7 +4,7 @@ WORKDIR /app/backend
 COPY backend/package*.json ./
 RUN npm install
 COPY backend/ ./
-RUN npm run build
+RUN npm run build && cp src/database/schema.sql dist/database/schema.sql
 
 # Stage 2: Build frontend
 FROM node:20-alpine AS frontend-build
