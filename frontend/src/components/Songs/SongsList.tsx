@@ -47,11 +47,9 @@ export default function SongsList() {
 
       <div className={styles.tableHeader}>
         <div className={styles.num}>#</div>
+        <div />
         <button className={styles.col} onClick={() => handleSort('title')}>
           Title{sortIndicator('title')}
-        </button>
-        <button className={styles.col} onClick={() => handleSort('artist')}>
-          Artist{sortIndicator('artist')}
         </button>
         <button className={styles.col} onClick={() => handleSort('album')}>
           Album{sortIndicator('album')}

@@ -26,7 +26,7 @@ export default function TrackRow({ track, queue, showArtwork = false, showAlbum 
 
   return (
     <div
-      className={`${styles.row} ${isActive ? styles.active : ''}`}
+      className={`${styles.row} ${isActive ? styles.active : ''} ${showAlbum ? styles.withAlbum : ''}`}
       onClick={handleClick}
       role="button"
       tabIndex={0}

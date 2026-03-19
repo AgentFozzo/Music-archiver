@@ -21,9 +21,14 @@
   color: var(--color-accent);
 }
 
-/* With artwork: adjust columns */
+/* With artwork only */
 .row:has(.artwork) {
   grid-template-columns: 32px 36px 1fr auto;
+}
+
+/* With artwork and album */
+.row.withAlbum:has(.artwork) {
+  grid-template-columns: 32px 36px minmax(0, 1fr) minmax(0, 1fr) 60px;
 }
 
 /* With album: adjust columns */
@@ -68,7 +73,7 @@
 .album {
   font-size: 13px;
   color: var(--color-text-secondary);
-  max-width: 200px;
+  min-width: 0;
 }
 
 .duration {
