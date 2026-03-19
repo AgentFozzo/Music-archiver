@@ -1,0 +1,190 @@
+.view {
+  padding: 24px 0;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 0 24px 16px 24px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.count {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.loading {
+  padding: 48px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--color-border);
+  transition: background var(--transition);
+  cursor: pointer;
+}
+
+.row:hover {
+  background: var(--color-surface-hover);
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--color-surface);
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarFallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent);
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.sub {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.chevron {
+  font-size: 20px;
+  color: var(--color-text-tertiary);
+}
+
+/* Artist detail */
+.detail {
+  padding: 0 0 48px 0;
+}
+
+.hero {
+  padding: 40px 24px 24px 24px;
+  background: linear-gradient(to bottom, var(--color-surface), transparent);
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.heroName {
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+}
+
+.heroSub {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.playBtn {
+  margin-top: 12px;
+  align-self: flex-start;
+  padding: 10px 28px;
+  border-radius: 20px;
+  background: var(--color-accent);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  transition: background var(--transition);
+}
+
+.playBtn:hover {
+  background: var(--color-accent-hover);
+}
+
+.bio {
+  padding: 0 24px 24px 24px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.section {
+  margin-bottom: 32px;
+  padding: 0;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 700;
+  padding: 0 24px 12px 24px;
+}
+
+.albumGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 16px;
+  padding: 0 24px;
+}
+
+.albumCard {
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+
+.albumCard:hover {
+  opacity: 0.8;
+}
+
+.albumArt {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: 6px;
+  background: var(--color-surface);
+}
+
+.albumTitle {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.albumYear {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}

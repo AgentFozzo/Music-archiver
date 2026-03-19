@@ -1,0 +1,10 @@
+node_modules/
+dist/
+build/
+*.js.map
+.env
+*.db
+*.db-shm
+*.db-wal
+.DS_Store
+artwork/

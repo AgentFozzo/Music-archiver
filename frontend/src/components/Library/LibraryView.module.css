@@ -1,0 +1,101 @@
+.view {
+  padding: 24px 0;
+}
+
+.loading {
+  padding: 48px;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.section {
+  margin-bottom: 36px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 24px 12px 24px;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.seeAll {
+  font-size: 13px;
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+.albumGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 16px;
+  padding: 0 24px;
+}
+
+.albumCard {
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+
+.albumCard:hover {
+  opacity: 0.8;
+}
+
+.albumArt {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: 8px;
+  background: var(--color-surface);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.albumTitle {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.albumArtist {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.trackList {
+  padding: 0 8px;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.emptyIcon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+.empty h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 8px;
+}
+
+.empty p {
+  font-size: 14px;
+  max-width: 320px;
+}

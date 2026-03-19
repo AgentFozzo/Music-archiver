@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  music-archiver:
+    build: .
+    container_name: music-archiver
+    ports:
+      - "3000:3000"
+    volumes:
+      # Unraid: map your music share here (read-only recommended)
+      - /mnt/user/Music:/music:ro
+      # Persistent storage for SQLite database
+      - /mnt/user/appdata/music-archiver/db:/data
+      # Cached album artwork
+      - /mnt/user/appdata/music-archiver/artwork:/artwork
+    environment:
+      - MUSIC_DIR=/music
+      - DB_PATH=/data/music.db
+      - ARTWORK_DIR=/artwork
+      - LASTFM_API_KEY=${LASTFM_API_KEY:-}
+      - PORT=3000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
