@@ -16,10 +16,12 @@ export function useMediaSession(
   useEffect(() => {
     if (!('mediaSession' in navigator) || !currentTrack) return;
 
+    // iOS requires absolute URLs for lock screen artwork
+    const origin = window.location.origin;
     const artwork: MediaImage[] = currentTrack.album_id
       ? [
-          { src: api.artworkUrl(currentTrack.album_id), sizes: '512x512', type: 'image/jpeg' },
-          { src: api.artworkUrl(currentTrack.album_id), sizes: '256x256', type: 'image/jpeg' },
+          { src: origin + api.artworkUrl(currentTrack.album_id), sizes: '512x512', type: 'image/jpeg' },
+          { src: origin + api.artworkUrl(currentTrack.album_id), sizes: '256x256', type: 'image/jpeg' },
         ]
       : [];
 
@@ -61,8 +63,8 @@ export function useMediaSession(
       ['nexttrack', () => next()],
       ['previoustrack', () => prev()],
       ['seekto', (details) => { if (details.seekTime != null) onSeek(details.seekTime); }],
-      ['seekforward', (details) => { onSeek(Math.min(currentTime + (details.seekOffset ?? 10), duration)); }],
-      ['seekbackward', (details) => { onSeek(Math.max(currentTime - (details.seekOffset ?? 10), 0)); }],
+      // Note: do NOT register seekforward/seekbackward — iOS replaces the
+      // prev/next buttons with ±10s skip buttons when those handlers exist.
     ];
 
     for (const [action, handler] of handlers) {

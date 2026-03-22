@@ -26,6 +26,15 @@
   height: 52px;
   border-radius: var(--radius-sm);
   overflow: hidden;
+  cursor: pointer;
+  padding: 0;
+  background: none;
+  border: none;
+  transition: opacity var(--transition);
+}
+
+.artwork:hover {
+  opacity: 0.85;
 }
 
 .artworkPlaceholder {
@@ -182,6 +191,17 @@
   .player {
     grid-template-columns: 1fr auto;
     padding: 0 12px;
+    height: 64px;
+  }
+
+  .artwork {
+    width: 42px;
+    height: 42px;
+  }
+
+  .artworkPlaceholder {
+    width: 42px;
+    height: 42px;
   }
 
   .volume {
@@ -190,6 +210,16 @@
 
   .controls {
     min-width: unset;
-    max-width: 200px;
+    max-width: 180px;
+    gap: 4px;
+  }
+
+  /* Hide progress row on mobile — access via now-playing modal */
+  .progressRow {
+    display: none;
+  }
+
+  .buttons {
+    gap: 4px;
   }
 }
