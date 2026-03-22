@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import chokidar, { FSWatcher } from 'chokidar';
 import { isAudioFile, processAudioFile, removeTrack } from './localMetadata';
-import { enrichAlbumOnline, fetchArtistBioFromLastFm } from './musicbrainz';
+import { enrichAlbumOnline, enrichNewArtists } from './musicbrainz';
 import { getDb } from '../database/db';
 
 let watcher: FSWatcher | null = null;
@@ -67,24 +67,6 @@ async function enrichNewAlbums(): Promise<void> {
   }
 }
 
-async function enrichNewArtists(): Promise<void> {
-  const apiKey = process.env.LASTFM_API_KEY;
-  if (!apiKey) return;
-
-  const db = getDb();
-  const artists = db.prepare(
-    'SELECT id, name FROM artists WHERE bio IS NULL OR image_url IS NULL LIMIT 50'
-  ).all() as Array<{ id: string; name: string }>;
-
-  for (const artist of artists) {
-    try {
-      await fetchArtistBioFromLastFm(artist.id, artist.name, apiKey);
-      await new Promise(r => setTimeout(r, 250));
-    } catch (err) {
-      console.warn(`Artist metadata fetch failed for "${artist.name}":`, err);
-    }
-  }
-}
 
 export async function runFullScan(musicDir: string, artworkDir: string): Promise<number> {
   if (isScanning) {

@@ -243,45 +243,61 @@
   }
 }
 
+/* Mobile tabs — hidden by default (desktop shows nothing here) */
+.mobileTabs { display: none; }
+.mobileTab { display: none; }
+.mobileTabLabel { display: none; }
+
 /* Mobile: bottom tab bar */
 @media (max-width: 640px) {
   .sidebar {
     grid-area: sidebar;
-    flex-direction: row;
+    flex-direction: column;
     border-right: none;
-    border-top: 1px solid var(--color-border);
-    padding: 0 0 env(safe-area-inset-bottom, 0px) 0;
-    align-items: flex-start;
-    justify-content: space-around;
+    padding: 0;
+    overflow: visible;
   }
 
-  .logo, .searchWrapper, .sectionLabel, .sectionRow,
+  /* Hide all desktop-only elements */
+  .logo, .sectionLabel, .sectionRow,
   .newPlaylistForm, .playlistList, .emptyPlaylists,
-  .spacer, .actions {
+  .spacer, .actions, .nav {
     display: none;
   }
 
-  .nav {
+  /* Show mobile tabs */
+  .mobileTabs {
+    display: flex;
     flex-direction: row;
     width: 100%;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-sidebar);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
     justify-content: space-around;
-    padding: 0;
-    gap: 0;
   }
 
-  .navItem {
+  .mobileTab {
+    display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 2px;
-    padding: 8px 12px;
-    font-size: 10px;
+    padding: 8px 4px;
+    flex: 1;
+    color: var(--color-text-tertiary);
+    transition: color var(--transition);
+    min-width: 0;
   }
 
-  .navLabel {
+  .mobileTab.active {
+    color: var(--color-accent);
+  }
+
+  .mobileTabLabel {
     display: block;
-    font-size: 10px;
-  }
-
-  .navIcon {
-    font-size: 18px;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
   }
 }

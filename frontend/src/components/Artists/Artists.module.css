@@ -148,14 +148,41 @@
 }
 
 .hero {
-  padding: 40px 24px 24px 24px;
+  padding: 40px 24px 28px 24px;
   background: linear-gradient(to bottom, var(--color-surface), transparent);
+  position: relative;
+}
+
+.heroWithImage {
+  background-size: cover;
+  background-position: center top;
+  min-height: 280px;
+  padding: 0;
+}
+
+.heroOverlay {
+  padding: 40px 24px 28px 24px;
+}
+
+.heroWithImage .heroOverlay {
+  min-height: 280px;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 24px 28px 24px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.75) 100%);
+}
+
+.heroWithImage .heroName,
+.heroWithImage .heroSub {
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
 }
 
 .heroContent {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  width: 100%;
 }
 
 .heroName {
@@ -169,9 +196,15 @@
   color: var(--color-text-secondary);
 }
 
-.playBtn {
+.heroActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
   margin-top: 12px;
-  align-self: flex-start;
+}
+
+.playBtn {
   padding: 10px 28px;
   border-radius: 20px;
   background: var(--color-accent);
@@ -183,6 +216,40 @@
 
 .playBtn:hover {
   background: var(--color-accent-hover);
+}
+
+.enrichBtn {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  transition: background var(--transition), color var(--transition);
+}
+
+.heroWithImage .enrichBtn {
+  border-color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.15);
+  color: white;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.enrichBtn:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.heroWithImage .enrichBtn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.25);
+  color: white;
+}
+
+.enrichBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .bio {
@@ -236,4 +303,20 @@
 .albumYear {
   font-size: 12px;
   color: var(--color-text-secondary);
+}
+
+@media (max-width: 640px) {
+  .heroName {
+    font-size: 28px;
+  }
+
+  .heroWithImage {
+    min-height: 220px;
+  }
+
+  .albumGrid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 12px;
+    padding: 0 16px;
+  }
 }

@@ -14,6 +14,7 @@ interface NavItem {
   Icon: React.ComponentType<{ size?: number }>;
 }
 
+// Desktop sidebar nav
 const navItems: NavItem[] = [
   { to: '/',        label: 'Library', Icon: IconLibrary },
   { to: '/songs',   label: 'Songs',   Icon: IconSongs   },
@@ -21,32 +22,29 @@ const navItems: NavItem[] = [
   { to: '/artists', label: 'Artists', Icon: IconArtists },
 ];
 
+// Mobile bottom tab items (search replaces songs for space efficiency)
+const mobileTabItems: NavItem[] = [
+  { to: '/',        label: 'Library', Icon: IconLibrary },
+  { to: '/albums',  label: 'Albums',  Icon: IconAlbums  },
+  { to: '/artists', label: 'Artists', Icon: IconArtists },
+  { to: '/search',  label: 'Search',  Icon: IconSearch  },
+  { to: '/settings',label: 'Settings',Icon: IconSettings},
+];
+
 const bottomNavItems: NavItem[] = [
   { to: '/settings', label: 'Settings', Icon: IconSettings },
 ];
 
 export default function Sidebar() {
-  const [searching, setSearching] = useState(false);
-  const [query, setQuery] = useState('');
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [creatingPlaylist, setCreatingPlaylist] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState('');
-  const searchRef = useRef<HTMLInputElement>(null);
   const newPlaylistRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     api.playlists.list().then(r => setPlaylists(r.playlists)).catch(() => {});
   }, []);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (query.trim()) {
-      navigate(`/search?q=${encodeURIComponent(query.trim())}`);
-      setSearching(false);
-      setQuery('');
-    }
-  };
 
   const handleScan = async () => {
     try { await api.scan(); } catch (e) { console.error('Scan failed:', e); }
@@ -74,35 +72,28 @@ export default function Sidebar() {
 
   return (
     <aside className={styles.sidebar}>
-      {/* Logo */}
+      {/* Mobile: bottom tab bar */}
+      <nav className={styles.mobileTabs}>
+        {mobileTabItems.map(item => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.to === '/'}
+            className={({ isActive }) => `${styles.mobileTab} ${isActive ? styles.active : ''}`}
+          >
+            <span className={styles.navIcon}><item.Icon size={20} /></span>
+            <span className={styles.mobileTabLabel}>{item.label}</span>
+          </NavLink>
+        ))}
+      </nav>
+
+      {/* Desktop: Logo */}
       <div className={styles.logo}>
         <IconLibrary size={20} />
         <span className={styles.logoText}>Music</span>
       </div>
 
-      {/* Search */}
-      <div className={styles.searchWrapper}>
-        {searching ? (
-          <form onSubmit={handleSearch} className={styles.searchForm}>
-            <input
-              ref={searchRef}
-              className={styles.searchInput}
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              placeholder="Search..."
-              autoFocus
-              onBlur={() => { if (!query) setSearching(false); }}
-            />
-          </form>
-        ) : (
-          <button className={styles.searchBtn} onClick={() => setSearching(true)}>
-            <IconSearch size={14} />
-            <span className={styles.searchLabel}>Search</span>
-          </button>
-        )}
-      </div>
-
-      {/* Library nav */}
+      {/* Desktop: Library nav */}
       <nav className={styles.nav}>
         <span className={styles.sectionLabel}>Library</span>
         {navItems.map(item => (

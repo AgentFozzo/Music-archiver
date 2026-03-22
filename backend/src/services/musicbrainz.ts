@@ -147,3 +147,121 @@ export async function getSimilarArtistsFromLastFm(
     return [];
   }
 }
+
+/**
+ * Enrich an artist using MusicBrainz + Wikipedia.
+ * No API key required. Rate-limit: call with 1.1s delay between artists.
+ *
+ * Strategy:
+ *  1. Search MusicBrainz for the artist to get their MBID + Wikipedia URL relation
+ *  2. Fetch Wikipedia summary API for bio text + thumbnail image
+ *  3. Store bio and image_url in the artists table
+ */
+export async function enrichArtistFromMusicBrainz(
+  artistId: string,
+  artistName: string,
+): Promise<void> {
+  const db = getDb();
+
+  try {
+    // 1. Search MB for artist
+    const query = encodeURIComponent(`artist:"${artistName}"`);
+    const mbData = await mbFetch(
+      `${MB_BASE}/artist?query=${query}&limit=1&fmt=json&inc=url-rels`
+    ) as { artists?: Array<{
+      id: string;
+      relations?: Array<{ type: string; url?: { resource: string } }>;
+    }> };
+
+    const mbArtist = mbData.artists?.[0];
+    if (!mbArtist) return;
+
+    const mbId = mbArtist.id;
+    db.prepare('UPDATE artists SET musicbrainz_id = ? WHERE id = ?').run(mbId, artistId);
+
+    // 2. Find Wikipedia or Wikidata URL relation
+    const relations = mbArtist.relations ?? [];
+    const wikiRel = relations.find(r => r.type === 'wikipedia' && r.url?.resource);
+    const wikidataRel = relations.find(r => r.type === 'wikidata' && r.url?.resource);
+
+    let bio: string | null = null;
+    let imageUrl: string | null = null;
+
+    if (wikiRel?.url?.resource) {
+      // Extract Wikipedia title from URL, use REST API
+      const wikiUrl = wikiRel.url.resource;
+      const titleMatch = wikiUrl.match(/wikipedia\.org\/wiki\/(.+)$/);
+      if (titleMatch) {
+        const title = titleMatch[1];
+        const lang = wikiUrl.includes('en.wikipedia') ? 'en' : 'en';
+        const apiUrl = `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${title}`;
+        try {
+          const wRes = await fetch(apiUrl, { headers: { 'User-Agent': USER_AGENT } });
+          if (wRes.ok) {
+            const wData = await wRes.json() as {
+              extract?: string;
+              thumbnail?: { source?: string };
+            };
+            bio = wData.extract ?? null;
+            imageUrl = wData.thumbnail?.source ?? null;
+          }
+        } catch { /* ignore */ }
+      }
+    } else if (wikidataRel?.url?.resource) {
+      // Extract Wikidata Q-ID and use Wikidata API to find Wikipedia title
+      const qMatch = wikidataRel.url.resource.match(/Q\d+$/);
+      if (qMatch) {
+        const qId = qMatch[0];
+        try {
+          const wdRes = await fetch(
+            `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${qId}&format=json&props=sitelinks&sitefilter=enwiki`,
+            { headers: { 'User-Agent': USER_AGENT } }
+          );
+          if (wdRes.ok) {
+            const wdData = await wdRes.json() as {
+              entities?: Record<string, { sitelinks?: Record<string, { title?: string }> }>;
+            };
+            const wikiTitle = wdData.entities?.[qId]?.sitelinks?.enwiki?.title;
+            if (wikiTitle) {
+              const apiUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(wikiTitle)}`;
+              const wRes = await fetch(apiUrl, { headers: { 'User-Agent': USER_AGENT } });
+              if (wRes.ok) {
+                const wData = await wRes.json() as { extract?: string; thumbnail?: { source?: string } };
+                bio = wData.extract ?? null;
+                imageUrl = wData.thumbnail?.source ?? null;
+              }
+            }
+          }
+        } catch { /* ignore */ }
+      }
+    }
+
+    if (bio || imageUrl) {
+      db.prepare(
+        'UPDATE artists SET bio = COALESCE(bio, ?), image_url = COALESCE(image_url, ?) WHERE id = ?'
+      ).run(bio, imageUrl, artistId);
+      console.log(`Enriched artist "${artistName}" from Wikipedia`);
+    }
+  } catch (err) {
+    console.warn(`Artist enrichment failed for "${artistName}":`, err);
+  }
+}
+
+/** Enrich all artists missing bio/image. Runs in background, rate-limited. */
+export async function enrichNewArtists(apiKey?: string): Promise<void> {
+  const db = getDb();
+  const artists = db.prepare(
+    'SELECT id, name FROM artists WHERE (bio IS NULL OR image_url IS NULL) AND musicbrainz_id IS NULL LIMIT 50'
+  ).all() as Array<{ id: string; name: string }>;
+
+  for (const artist of artists) {
+    try {
+      if (apiKey) {
+        await fetchArtistBioFromLastFm(artist.id, artist.name, apiKey);
+      } else {
+        await enrichArtistFromMusicBrainz(artist.id, artist.name);
+      }
+      await new Promise(r => setTimeout(r, 1100)); // MusicBrainz rate limit: 1 req/s
+    } catch { /* ignore per-artist errors */ }
+  }
+}

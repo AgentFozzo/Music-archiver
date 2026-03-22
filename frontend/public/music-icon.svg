@@ -1,18 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#1a1a1a"/>
-  <circle cx="256" cy="256" r="200" fill="#111"/>
-  <circle cx="256" cy="256" r="80" fill="#222"/>
-  <circle cx="256" cy="256" r="20" fill="#e53935"/>
-  <!-- Vinyl grooves -->
-  <circle cx="256" cy="256" r="140" fill="none" stroke="#2a2a2a" stroke-width="4"/>
-  <circle cx="256" cy="256" r="120" fill="none" stroke="#2a2a2a" stroke-width="3"/>
-  <circle cx="256" cy="256" r="100" fill="none" stroke="#2a2a2a" stroke-width="3"/>
-  <!-- Music note -->
-  <g transform="translate(256,256)" fill="#e53935" opacity="0.9">
-    <rect x="-6" y="-60" width="12" height="50" rx="6"/>
-    <rect x="14" y="-70" width="12" height="40" rx="6"/>
-    <rect x="-6" y="-14" width="32" height="6" rx="3"/>
-    <circle cx="-12" cy="-8" r="14"/>
-    <circle cx="20" cy="-24" r="14"/>
-  </g>
+  <!-- Pink background -->
+  <rect width="512" height="512" fill="#f5c1c8"/>
+  <!-- Double beamed eighth notes (black) -->
+  <!-- Beam -->
+  <polygon points="145,130 330,155 330,197 145,172" fill="#000"/>
+  <!-- Left stem -->
+  <rect x="131" y="130" width="28" height="228" fill="#000"/>
+  <!-- Right stem -->
+  <rect x="312" y="155" width="28" height="228" fill="#000"/>
+  <!-- Left note head -->
+  <ellipse cx="148" cy="358" rx="55" ry="46" fill="#000"/>
+  <!-- Right note head -->
+  <ellipse cx="325" cy="383" rx="48" ry="40" fill="#000"/>
 </svg>

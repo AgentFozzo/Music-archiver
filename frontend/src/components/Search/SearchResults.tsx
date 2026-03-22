@@ -39,7 +39,11 @@ export default function SearchResults() {
           {results.artists.map(artist => (
             <Link key={artist.id} to={`/artists/${artist.id}`} className={styles.artistRow}>
               <div className={styles.artistAvatar}>
-                {artist.name.charAt(0).toUpperCase()}
+                {artist.image_url ? (
+                  <img src={artist.image_url} alt={artist.name} width={40} height={40} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  artist.name.charAt(0).toUpperCase()
+                )}
               </div>
               <div>
                 <div className={styles.artistName}>{artist.name}</div>

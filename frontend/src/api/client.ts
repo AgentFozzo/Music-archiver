@@ -67,7 +67,8 @@ export const api = {
     list: () => get<{ artists: Artist[] }>('/artists'),
     get: (id: string) => get<Artist>(`/artists/${id}`),
     normalize: () => post<{ merged: number }>('/artists/normalize', {}),
-    fetchMetadata: () => post<{ queued: number }>('/artists/fetch-metadata', {}),
+    fetchMetadata: () => post<{ queued: number; source: string }>('/artists/fetch-metadata', {}),
+    enrich: (id: string) => post<{ ok: boolean }>(`/artists/${id}/enrich`, {}),
   },
 
   playlists: {

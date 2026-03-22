@@ -11,16 +11,32 @@ export default function ArtistDetail() {
   const { id } = useParams<{ id: string }>();
   const [artist, setArtist] = useState<Artist | null>(null);
   const [loading, setLoading] = useState(true);
+  const [enriching, setEnriching] = useState(false);
   const { playTrack } = usePlayerStore();
+
+  const load = () => {
+    if (!id) return Promise.resolve();
+    return api.artists.get(id).then(setArtist).catch(console.error);
+  };
 
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    api.artists.get(id)
-      .then(setArtist)
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    load().finally(() => setLoading(false));
   }, [id]);
+
+  const handleEnrich = async () => {
+    if (!id) return;
+    setEnriching(true);
+    try {
+      await api.artists.enrich(id);
+      await load();
+    } catch (e) {
+      console.error('Enrich failed:', e);
+    } finally {
+      setEnriching(false);
+    }
+  };
 
   if (loading) return <div className={styles.loading}>Loading artist...</div>;
   if (!artist) return <div className={styles.loading}>Artist not found.</div>;
@@ -30,22 +46,37 @@ export default function ArtistDetail() {
   return (
     <div className={styles.detail}>
       {/* Hero */}
-      <div className={styles.hero}>
-        <div className={styles.heroContent}>
-          <h1 className={styles.heroName}>{artist.name}</h1>
-          <span className={styles.heroSub}>{artist.album_count} albums · {artist.track_count} songs</span>
-          {tracks.length > 0 && (
-            <button className={styles.playBtn} onClick={() => playTrack(tracks[0], tracks)}>
-              ▶ Play
-            </button>
-          )}
+      <div
+        className={`${styles.hero} ${artist.image_url ? styles.heroWithImage : ''}`}
+        style={artist.image_url ? { backgroundImage: `url(${artist.image_url})` } : undefined}
+      >
+        <div className={styles.heroOverlay}>
+          <div className={styles.heroContent}>
+            <h1 className={styles.heroName}>{artist.name}</h1>
+            <span className={styles.heroSub}>{artist.album_count} albums · {artist.track_count} songs</span>
+            <div className={styles.heroActions}>
+              {tracks.length > 0 && (
+                <button className={styles.playBtn} onClick={() => playTrack(tracks[0], tracks)}>
+                  ▶ Play
+                </button>
+              )}
+              <button
+                className={styles.enrichBtn}
+                onClick={handleEnrich}
+                disabled={enriching}
+                title="Fetch artist bio and image from MusicBrainz/Wikipedia"
+              >
+                {enriching ? 'Fetching…' : '✦ Get Metadata'}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Bio */}
       {artist.bio && (
         <div className={styles.bio}>
-          <p>{artist.bio.slice(0, 400)}{artist.bio.length > 400 ? '…' : ''}</p>
+          <p>{artist.bio.slice(0, 500)}{artist.bio.length > 500 ? '…' : ''}</p>
         </div>
       )}
 

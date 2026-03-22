@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { getDb } from '../database/db';
-import { fetchArtistBioFromLastFm } from '../services/musicbrainz';
+import { fetchArtistBioFromLastFm, enrichArtistFromMusicBrainz, enrichNewArtists } from '../services/musicbrainz';
 import { extractPrimaryArtist } from '../services/localMetadata';
 
 const router = Router();
@@ -72,28 +72,36 @@ router.post('/normalize', (req: Request, res: Response) => {
   res.json({ merged });
 });
 
-// Fetch Last.fm bio + image for artists missing metadata
+// Fetch bio + image for artists missing metadata
+// Uses Last.fm if LASTFM_API_KEY is set, otherwise MusicBrainz + Wikipedia (no key needed)
 router.post('/fetch-metadata', async (req: Request, res: Response) => {
   const apiKey = process.env.LASTFM_API_KEY;
-  if (!apiKey) return res.status(400).json({ error: 'LASTFM_API_KEY not configured' });
-
   const db = getDb();
   const artists = db.prepare(
     'SELECT id, name FROM artists WHERE bio IS NULL OR image_url IS NULL LIMIT 100'
   ).all() as Array<{ id: string; name: string }>;
 
-  res.json({ queued: artists.length });
+  res.json({ queued: artists.length, source: apiKey ? 'lastfm' : 'musicbrainz' });
 
-  // Run in background after responding
-  (async () => {
-    for (const artist of artists) {
-      try {
-        await fetchArtistBioFromLastFm(artist.id, artist.name, apiKey);
-        await new Promise(r => setTimeout(r, 250));
-      } catch { /* ignore individual failures */ }
-    }
-    console.log(`Artist metadata fetch complete: ${artists.length} artists processed`);
-  })();
+  // Run in background
+  enrichNewArtists(apiKey).catch(err => console.error('Artist enrichment error:', err));
+});
+
+// Enrich a single artist on demand
+router.post('/:id/enrich', async (req: Request, res: Response) => {
+  const db = getDb();
+  const artist = db.prepare('SELECT id, name FROM artists WHERE id = ?').get(req.params.id) as
+    { id: string; name: string } | undefined;
+  if (!artist) return res.status(404).json({ error: 'Artist not found' });
+
+  res.json({ ok: true });
+
+  const apiKey = process.env.LASTFM_API_KEY;
+  if (apiKey) {
+    fetchArtistBioFromLastFm(artist.id, artist.name, apiKey).catch(() => {});
+  } else {
+    enrichArtistFromMusicBrainz(artist.id, artist.name).catch(() => {});
+  }
 });
 
 router.get('/:id', (req: Request, res: Response) => {

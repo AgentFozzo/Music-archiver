@@ -1,0 +1,62 @@
+.topBar {
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-sidebar);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  /* safe-area for notched phones */
+  padding-top: max(10px, env(safe-area-inset-top, 10px));
+}
+
+.searchForm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-surface);
+  border-radius: 10px;
+  padding: 0 10px;
+  height: 38px;
+}
+
+.searchIcon {
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  color: var(--color-text);
+  min-width: 0;
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+/* Remove Safari's default search input styling */
+.searchInput[type='search']::-webkit-search-decoration,
+.searchInput[type='search']::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+.clearBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-text-tertiary);
+  color: var(--color-bg);
+  flex-shrink: 0;
+  transition: background var(--transition);
+}
+
+.clearBtn:hover {
+  background: var(--color-text-secondary);
+}
