@@ -37,22 +37,31 @@ export default function PlayerBar() {
     seek(ratio * duration);
   };
 
+  const openNowPlaying = () => {
+    if (currentTrack) setNowPlayingOpen(true);
+  };
+
   return (
     <>
       <footer className={styles.player}>
-        {/* Track info */}
-        <div className={styles.trackInfo}>
-          <button
-            className={styles.artwork}
-            onClick={() => currentTrack && setNowPlayingOpen(true)}
-            aria-label="Open now playing"
-          >
-            {currentTrack?.album_id ? (
-              <ArtworkImage albumId={currentTrack.album_id} size={52} />
+        {/* Thin progress line across the top of the bar */}
+        <div className={styles.miniProgress} onClick={handleProgressClick}>
+          <div className={styles.miniProgressFill} style={{ width: `${progress}%` }} />
+        </div>
+
+        {/* Track info — tapping this area opens now-playing */}
+        <button className={styles.trackInfo} onClick={openNowPlaying} aria-label="Open now playing">
+          <div className={styles.artwork}>
+            {currentTrack?.album_id || currentTrack?.id ? (
+              <ArtworkImage
+                albumId={currentTrack.album_id}
+                trackId={currentTrack.id}
+                size={52}
+              />
             ) : (
               <div className={styles.artworkPlaceholder} />
             )}
-          </button>
+          </div>
           <div className={styles.meta}>
             <span className={`${styles.title} truncate`}>
               {currentTrack?.title ?? 'Not Playing'}
@@ -61,13 +70,13 @@ export default function PlayerBar() {
               {currentTrack?.artist_name ?? ''}
             </span>
           </div>
-        </div>
+        </button>
 
         {/* Controls */}
         <div className={styles.controls}>
           <div className={styles.buttons}>
             <button
-              className={`${styles.btn} ${isShuffle ? styles.active : ''}`}
+              className={`${styles.btn} ${styles.btnSide} ${isShuffle ? styles.active : ''}`}
               onClick={toggleShuffle}
               title="Shuffle"
             >
@@ -87,7 +96,7 @@ export default function PlayerBar() {
               <IconNext size={18} />
             </button>
             <button
-              className={`${styles.btn} ${isRepeat ? styles.active : ''}`}
+              className={`${styles.btn} ${styles.btnSide} ${isRepeat ? styles.active : ''}`}
               onClick={toggleRepeat}
               title="Repeat"
             >
@@ -106,7 +115,7 @@ export default function PlayerBar() {
           </div>
         </div>
 
-        {/* Volume */}
+        {/* Volume (desktop only) */}
         <div className={styles.volume}>
           <span className={styles.volumeIcon}>
             {volume === 0 ? <IconVolumeOff size={16} /> : volume < 0.5 ? <IconVolumeLow size={16} /> : <IconVolumeHigh size={16} />}

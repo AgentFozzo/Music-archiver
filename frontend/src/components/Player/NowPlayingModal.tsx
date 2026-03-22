@@ -50,6 +50,7 @@ export default function NowPlayingModal({ onClose }: Props) {
         <div className={styles.artworkWrap}>
           <ArtworkImage
             albumId={currentTrack.album_id}
+            trackId={currentTrack.id}
             size={300}
             style={{ width: '100%', height: '100%', borderRadius: 12 }}
           />

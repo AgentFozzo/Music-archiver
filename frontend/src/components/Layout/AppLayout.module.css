@@ -35,7 +35,7 @@
 @media (max-width: 640px) {
   .root {
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr 64px calc(60px + env(safe-area-inset-bottom, 0px));
+    grid-template-rows: 1fr 76px calc(60px + env(safe-area-inset-bottom, 0px));
     grid-template-areas:
       "main"
       "player"

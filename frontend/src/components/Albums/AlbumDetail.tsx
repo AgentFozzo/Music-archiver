@@ -28,8 +28,17 @@ export default function AlbumDetail() {
 
   const totalDuration = album.tracks.reduce((sum, t) => sum + (t.duration ?? 0), 0);
 
+  // Ensure every track in the queue has album_id / album_title / artwork_path so
+  // the player bar can always resolve artwork (API may omit album_id on child tracks)
+  const tracks = album.tracks.map(t => ({
+    ...t,
+    album_id: t.album_id ?? album.id,
+    album_title: t.album_title ?? album.title,
+    artwork_path: t.artwork_path ?? album.artwork_path,
+  }));
+
   const playAll = () => {
-    if (album.tracks.length > 0) playTrack(album.tracks[0], album.tracks);
+    if (tracks.length > 0) playTrack(tracks[0], tracks);
   };
 
   return (
@@ -66,11 +75,11 @@ export default function AlbumDetail() {
       </div>
 
       <div className={styles.trackList}>
-        {album.tracks.map((track, i) => (
+        {tracks.map((track, i) => (
           <TrackRow
             key={track.id}
-            track={{ ...track, album_title: album.title, artwork_path: album.artwork_path }}
-            queue={album.tracks}
+            track={track}
+            queue={tracks}
             index={i}
           />
         ))}
