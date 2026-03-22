@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { usePlayerStore } from '../store/playerStore';
 import { api } from '../api/client';
 import { registerAudioElement } from './useAudioSeek';
+import { useMediaSession } from './useMediaSession';
 
 export function useAudio() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -96,6 +97,8 @@ export function useAudio() {
       audioRef.current.currentTime = time;
     }
   };
+
+  useMediaSession(seek);
 
   return { audioRef, seek };
 }
