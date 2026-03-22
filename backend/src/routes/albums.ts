@@ -62,4 +62,28 @@ router.get('/:id', (req: Request, res: Response) => {
   res.json({ ...album as object, tracks });
 });
 
+// PUT /api/albums/:id — edit album metadata
+router.put('/:id', (req: Request, res: Response) => {
+  const db = getDb();
+  const { title, year, genre } = req.body as Record<string, string | number | null | undefined>;
+
+  const existing = db.prepare('SELECT * FROM albums WHERE id = ?').get(req.params.id) as Record<string, unknown> | undefined;
+  if (!existing) return res.status(404).json({ error: 'Album not found' });
+
+  db.prepare('UPDATE albums SET title = ?, year = ?, genre = ? WHERE id = ?').run(
+    title !== undefined ? String(title).trim() : existing.title,
+    year  !== undefined ? year  : existing.year,
+    genre !== undefined ? genre : existing.genre,
+    req.params.id,
+  );
+
+  const updated = db.prepare(`
+    SELECT al.*, ar.name as artist_name, ar.id as artist_id
+    FROM albums al LEFT JOIN artists ar ON ar.id = al.artist_id
+    WHERE al.id = ?
+  `).get(req.params.id);
+
+  res.json(updated);
+});
+
 export default router;

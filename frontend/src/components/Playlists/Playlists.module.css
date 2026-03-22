@@ -56,6 +56,62 @@
   background: var(--color-accent-hover);
 }
 
+.headerInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.headerActions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.iconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: var(--color-text-secondary);
+  transition: background var(--transition), color var(--transition);
+}
+
+.iconBtn:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.danger {
+  color: #e57373;
+}
+
+.danger:hover {
+  background: rgba(229, 115, 115, 0.1) !important;
+}
+
+.renameInput {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--color-accent);
+  outline: none;
+  color: var(--color-text);
+  width: 100%;
+  padding: 0 0 2px 0;
+}
+
+.empty {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
 .loading {
   padding: 48px;
   text-align: center;

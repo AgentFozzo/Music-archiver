@@ -21,14 +21,19 @@
   color: var(--color-accent);
 }
 
-/* With artwork only */
+/* With artwork only: # | art | info | actions | duration */
 .row:has(.artwork) {
-  grid-template-columns: 32px 36px 1fr auto;
+  grid-template-columns: 32px 36px 1fr 28px auto;
 }
 
-/* With artwork and album */
+/* With artwork and album: # | art | info | album | actions | duration */
 .row.withAlbum:has(.artwork) {
-  grid-template-columns: 32px 36px minmax(0, 1fr) minmax(0, 1fr) 60px;
+  grid-template-columns: 32px 36px minmax(0, 1fr) minmax(0, 1fr) 28px 60px;
+}
+
+/* Show the "..." button only on hover (CSS handles it for desktop) */
+.row:hover .actions > * {
+  opacity: 1;
 }
 
 /* With album: adjust columns */
@@ -74,6 +79,12 @@
   font-size: 13px;
   color: var(--color-text-secondary);
   min-width: 0;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .duration {

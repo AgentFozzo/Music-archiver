@@ -67,11 +67,69 @@
 
 .sectionLabel {
   display: block;
-  padding: 4px 16px 6px 16px;
+  padding: 4px 0 6px 8px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  color: var(--color-text-tertiary);
+  flex: 1;
+}
+
+.sectionRow {
+  display: flex;
+  align-items: center;
+  padding: 0 2px 0 0;
+}
+
+.addBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-tertiary);
+  transition: background var(--transition), color var(--transition);
+  flex-shrink: 0;
+}
+
+.addBtn:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.newPlaylistForm {
+  padding: 4px 2px 6px 2px;
+}
+
+.newPlaylistInput {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg, #111);
+  border: 1px solid var(--color-accent);
+  font-size: 13px;
+  outline: none;
+  color: var(--color-text);
+}
+
+.playlistList {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.playlistName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emptyPlaylists {
+  display: block;
+  padding: 6px 10px;
+  font-size: 12px;
   color: var(--color-text-tertiary);
 }
 
@@ -143,6 +201,10 @@
   .searchLabel,
   .navLabel,
   .sectionLabel,
+  .sectionRow,
+  .newPlaylistForm,
+  .playlistList,
+  .emptyPlaylists,
   .scanBtn span:last-child {
     display: none;
   }
@@ -193,7 +255,9 @@
     justify-content: space-around;
   }
 
-  .logo, .searchWrapper, .sectionLabel, .spacer, .actions {
+  .logo, .searchWrapper, .sectionLabel, .sectionRow,
+  .newPlaylistForm, .playlistList, .emptyPlaylists,
+  .spacer, .actions {
     display: none;
   }
 

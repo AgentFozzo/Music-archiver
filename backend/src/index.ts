@@ -14,6 +14,7 @@ import recommendationsRouter from './routes/recommendations';
 import historyRouter from './routes/history';
 import scannerRouter from './routes/scanner';
 import playlistsRouter from './routes/playlists';
+import radioRouter from './routes/radio';
 import settingsRouter from './routes/settings';
 
 const app = express();
@@ -44,6 +45,7 @@ app.use('/api/recommendations', recommendationsRouter);
 app.use('/api/history', historyRouter);
 app.use('/api/scan', scannerRouter);
 app.use('/api/playlists', playlistsRouter);
+app.use('/api/radio', radioRouter);
 app.use('/api/settings', settingsRouter);
 
 // Serve frontend static files

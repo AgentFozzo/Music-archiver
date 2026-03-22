@@ -1,0 +1,167 @@
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-tertiary);
+  opacity: 0;
+  transition: opacity var(--transition), background var(--transition), color var(--transition);
+  flex-shrink: 0;
+}
+
+.trigger:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+/* Show trigger when parent row is hovered or active */
+:global(.rowHovered) .trigger,
+.trigger:focus-visible {
+  opacity: 1;
+}
+
+/* Always visible on touch devices */
+@media (hover: none) {
+  .trigger { opacity: 1; }
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+}
+
+.menu {
+  position: fixed;
+  z-index: 100;
+  min-width: 220px;
+  background: var(--color-surface, #1e1e1e);
+  border: 1px solid var(--color-border, #333);
+  border-radius: var(--radius-md, 8px);
+  box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  padding: 6px 0;
+  overflow: hidden;
+}
+
+.trackInfo {
+  padding: 8px 14px 6px 14px;
+}
+
+.trackTitle {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trackArtist {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border, #333);
+  margin: 4px 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 14px;
+  font-size: 13px;
+  color: var(--color-text);
+  text-align: left;
+  transition: background var(--transition);
+  white-space: nowrap;
+}
+
+.item:hover {
+  background: var(--color-surface-hover, #2a2a2a);
+}
+
+.danger {
+  color: #e57373;
+}
+
+.danger:hover {
+  background: rgba(229, 115, 115, 0.1);
+}
+
+.loading {
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.backBtn:hover {
+  color: var(--color-text);
+}
+
+.newPlaylist {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+}
+
+.newInput {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg, #111);
+  border: 1px solid var(--color-accent);
+  font-size: 13px;
+  outline: none;
+  color: var(--color-text);
+}
+
+.newConfirm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  color: white;
+  flex-shrink: 0;
+}
+
+/* Mobile: render as bottom sheet */
+@media (max-width: 640px) {
+  .backdrop {
+    background: rgba(0,0,0,.4);
+  }
+
+  .menu {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    top: auto !important;
+    min-width: unset;
+    border-radius: var(--radius-lg, 12px) var(--radius-lg, 12px) 0 0;
+    padding-bottom: env(safe-area-inset-bottom, 12px);
+  }
+}

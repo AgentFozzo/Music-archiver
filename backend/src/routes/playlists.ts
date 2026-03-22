@@ -71,6 +71,15 @@ router.delete('/:id/tracks/:trackId', (req: Request, res: Response) => {
   res.json({ ok: true });
 });
 
+router.put('/:id', (req: Request, res: Response) => {
+  const db = getDb();
+  const { name, description } = req.body as { name?: string; description?: string };
+  if (!name) return res.status(400).json({ error: 'name required' });
+  db.prepare('UPDATE playlists SET name = ?, description = ?, updated_at = unixepoch() WHERE id = ?')
+    .run(name.trim(), description ?? null, req.params.id);
+  res.json({ ok: true });
+});
+
 router.delete('/:id', (req: Request, res: Response) => {
   const db = getDb();
   db.prepare('DELETE FROM playlists WHERE id = ?').run(req.params.id);

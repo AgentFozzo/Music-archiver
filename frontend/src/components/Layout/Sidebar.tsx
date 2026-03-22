@@ -1,9 +1,10 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { api } from '../../api/client';
+import type { Playlist } from '../../types';
 import {
   IconLibrary, IconSongs, IconAlbums, IconArtists,
-  IconSettings, IconSearch, IconRefresh,
+  IconSettings, IconSearch, IconRefresh, IconPlaylist, IconPlus, IconX,
 } from '../common/Icons';
 import styles from './Sidebar.module.css';
 
@@ -27,8 +28,16 @@ const bottomNavItems: NavItem[] = [
 export default function Sidebar() {
   const [searching, setSearching] = useState(false);
   const [query, setQuery] = useState('');
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [creatingPlaylist, setCreatingPlaylist] = useState(false);
+  const [newPlaylistName, setNewPlaylistName] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
+  const newPlaylistRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    api.playlists.list().then(r => setPlaylists(r.playlists)).catch(() => {});
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,16 +49,32 @@ export default function Sidebar() {
   };
 
   const handleScan = async () => {
-    try {
-      await api.scan();
-    } catch (e) {
-      console.error('Scan failed:', e);
-    }
+    try { await api.scan(); } catch (e) { console.error('Scan failed:', e); }
   };
+
+  const handleCreatePlaylist = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    const name = newPlaylistName.trim();
+    if (!name) return;
+    try {
+      const pl = await api.playlists.create(name);
+      setPlaylists(prev => [
+        { ...pl, track_count: 0, created_at: Date.now() / 1000, updated_at: Date.now() / 1000 },
+        ...prev,
+      ]);
+      setNewPlaylistName('');
+      setCreatingPlaylist(false);
+      navigate(`/playlists/${pl.id}`);
+    } catch (e) { console.error(e); }
+  };
+
+  useEffect(() => {
+    if (creatingPlaylist) newPlaylistRef.current?.focus();
+  }, [creatingPlaylist]);
 
   return (
     <aside className={styles.sidebar}>
-      {/* Logo / App name */}
+      {/* Logo */}
       <div className={styles.logo}>
         <IconLibrary size={20} />
         <span className={styles.logoText}>Music</span>
@@ -77,7 +102,7 @@ export default function Sidebar() {
         )}
       </div>
 
-      {/* Library section */}
+      {/* Library nav */}
       <nav className={styles.nav}>
         <span className={styles.sectionLabel}>Library</span>
         {navItems.map(item => (
@@ -85,9 +110,7 @@ export default function Sidebar() {
             key={item.to}
             to={item.to}
             end={item.to === '/'}
-            className={({ isActive }) =>
-              `${styles.navItem} ${isActive ? styles.active : ''}`
-            }
+            className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
           >
             <span className={styles.navIcon}><item.Icon size={16} /></span>
             <span className={styles.navLabel}>{item.label}</span>
@@ -95,18 +118,56 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* Spacer */}
-      <div className={styles.spacer} />
+      {/* Playlists section */}
+      <nav className={styles.nav} style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div className={styles.sectionRow}>
+          <span className={styles.sectionLabel}>Playlists</span>
+          <button
+            className={styles.addBtn}
+            onClick={() => setCreatingPlaylist(v => !v)}
+            title="New playlist"
+          >
+            {creatingPlaylist ? <IconX size={13} /> : <IconPlus size={13} />}
+          </button>
+        </div>
 
-      {/* Bottom nav (Settings) */}
+        {creatingPlaylist && (
+          <form onSubmit={handleCreatePlaylist} className={styles.newPlaylistForm}>
+            <input
+              ref={newPlaylistRef}
+              className={styles.newPlaylistInput}
+              value={newPlaylistName}
+              onChange={e => setNewPlaylistName(e.target.value)}
+              placeholder="Playlist name"
+              onKeyDown={e => { if (e.key === 'Escape') { setCreatingPlaylist(false); setNewPlaylistName(''); } }}
+            />
+          </form>
+        )}
+
+        <div className={styles.playlistList}>
+          {playlists.map(pl => (
+            <NavLink
+              key={pl.id}
+              to={`/playlists/${pl.id}`}
+              className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
+            >
+              <span className={styles.navIcon}><IconPlaylist size={15} /></span>
+              <span className={`${styles.navLabel} ${styles.playlistName}`}>{pl.name}</span>
+            </NavLink>
+          ))}
+          {playlists.length === 0 && !creatingPlaylist && (
+            <span className={styles.emptyPlaylists}>No playlists yet</span>
+          )}
+        </div>
+      </nav>
+
+      {/* Bottom nav */}
       <nav className={styles.nav}>
         {bottomNavItems.map(item => (
           <NavLink
             key={item.to}
             to={item.to}
-            className={({ isActive }) =>
-              `${styles.navItem} ${isActive ? styles.active : ''}`
-            }
+            className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
           >
             <span className={styles.navIcon}><item.Icon size={16} /></span>
             <span className={styles.navLabel}>{item.label}</span>

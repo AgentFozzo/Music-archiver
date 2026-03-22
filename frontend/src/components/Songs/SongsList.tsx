@@ -54,6 +54,7 @@ export default function SongsList() {
         <button className={styles.col} onClick={() => handleSort('album')}>
           Album{sortIndicator('album')}
         </button>
+        <div />
         <button className={styles.colRight} onClick={() => handleSort('duration')}>
           Time{sortIndicator('duration')}
         </button>

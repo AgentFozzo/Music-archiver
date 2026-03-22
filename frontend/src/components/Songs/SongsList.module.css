@@ -36,7 +36,7 @@
 
 .tableHeader {
   display: grid;
-  grid-template-columns: 32px 36px minmax(0, 1fr) minmax(0, 1fr) 60px;
+  grid-template-columns: 32px 36px minmax(0, 1fr) minmax(0, 1fr) 28px 60px;
   gap: 10px;
   padding: 0 16px 4px 16px;
   color: var(--color-text-tertiary);
