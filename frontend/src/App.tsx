@@ -7,7 +7,9 @@ import AlbumDetail from './components/Albums/AlbumDetail';
 import ArtistsList from './components/Artists/ArtistsList';
 import ArtistDetail from './components/Artists/ArtistDetail';
 import SearchResults from './components/Search/SearchResults';
+import PlaylistsListView from './components/Playlists/PlaylistsListView';
 import PlaylistDetail from './components/Playlists/PlaylistDetail';
+import RadioView from './components/Radio/RadioView';
 import Settings from './components/Settings/Settings';
 import { useAudio } from './hooks/useAudio';
 
@@ -24,7 +26,9 @@ export default function App() {
         <Route path="/artists" element={<ArtistsList />} />
         <Route path="/artists/:id" element={<ArtistDetail />} />
         <Route path="/search" element={<SearchResults />} />
+        <Route path="/playlists" element={<PlaylistsListView />} />
         <Route path="/playlists/:id" element={<PlaylistDetail />} />
+        <Route path="/radio" element={<RadioView />} />
         <Route path="/settings" element={<Settings />} />
       </Routes>
     </AppLayout>

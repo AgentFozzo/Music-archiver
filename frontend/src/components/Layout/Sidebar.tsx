@@ -4,7 +4,7 @@ import { api } from '../../api/client';
 import type { Playlist } from '../../types';
 import {
   IconLibrary, IconSongs, IconAlbums, IconArtists,
-  IconSettings, IconSearch, IconRefresh, IconPlaylist, IconPlus, IconX,
+  IconSettings, IconSearch, IconRefresh, IconPlaylist, IconPlus, IconX, IconRadio,
 } from '../common/Icons';
 import styles from './Sidebar.module.css';
 
@@ -22,13 +22,14 @@ const navItems: NavItem[] = [
   { to: '/artists', label: 'Artists', Icon: IconArtists },
 ];
 
-// Mobile bottom tab items (search replaces songs for space efficiency)
+// Mobile bottom tab items — Playlists and Radio replace Artists/Settings
+// (Artists accessible via album drill-down; Settings via desktop only)
 const mobileTabItems: NavItem[] = [
-  { to: '/',        label: 'Library', Icon: IconLibrary },
-  { to: '/albums',  label: 'Albums',  Icon: IconAlbums  },
-  { to: '/artists', label: 'Artists', Icon: IconArtists },
-  { to: '/search',  label: 'Search',  Icon: IconSearch  },
-  { to: '/settings',label: 'Settings',Icon: IconSettings},
+  { to: '/',          label: 'Library',   Icon: IconLibrary  },
+  { to: '/albums',    label: 'Albums',    Icon: IconAlbums   },
+  { to: '/playlists', label: 'Playlists', Icon: IconPlaylist },
+  { to: '/radio',     label: 'Radio',     Icon: IconRadio    },
+  { to: '/search',    label: 'Search',    Icon: IconSearch   },
 ];
 
 const bottomNavItems: NavItem[] = [

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { usePlayerStore } from '../../store/playerStore';
+import { useAudioSeek } from '../../hooks/useAudioSeek';
 import { formatDuration } from '../../utils/format';
 import ArtworkImage from '../common/ArtworkImage';
 import NowPlayingModal from './NowPlayingModal';
@@ -26,7 +27,7 @@ export default function PlayerBar() {
     setVolume,
   } = usePlayerStore();
 
-  const { seek } = usePlayerSeek();
+  const { seek } = useAudioSeek();
   const [nowPlayingOpen, setNowPlayingOpen] = useState(false);
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
@@ -37,22 +38,22 @@ export default function PlayerBar() {
     seek(ratio * duration);
   };
 
-  const openNowPlaying = () => {
-    if (currentTrack) setNowPlayingOpen(true);
-  };
-
   return (
     <>
       <footer className={styles.player}>
-        {/* Thin progress line across the top of the bar */}
+        {/* Thin progress line at top (mobile only) */}
         <div className={styles.miniProgress} onClick={handleProgressClick}>
           <div className={styles.miniProgressFill} style={{ width: `${progress}%` }} />
         </div>
 
-        {/* Track info — tapping this area opens now-playing */}
-        <button className={styles.trackInfo} onClick={openNowPlaying} aria-label="Open now playing">
+        {/* Track info — full left side is tap target on mobile */}
+        <button
+          className={styles.trackInfo}
+          onClick={() => currentTrack && setNowPlayingOpen(true)}
+          aria-label="Open now playing"
+        >
           <div className={styles.artwork}>
-            {currentTrack?.album_id || currentTrack?.id ? (
+            {currentTrack ? (
               <ArtworkImage
                 albumId={currentTrack.album_id}
                 trackId={currentTrack.id}
@@ -118,7 +119,11 @@ export default function PlayerBar() {
         {/* Volume (desktop only) */}
         <div className={styles.volume}>
           <span className={styles.volumeIcon}>
-            {volume === 0 ? <IconVolumeOff size={16} /> : volume < 0.5 ? <IconVolumeLow size={16} /> : <IconVolumeHigh size={16} />}
+            {volume === 0
+              ? <IconVolumeOff size={16} />
+              : volume < 0.5
+              ? <IconVolumeLow size={16} />
+              : <IconVolumeHigh size={16} />}
           </span>
           <input
             type="range"
@@ -137,10 +142,4 @@ export default function PlayerBar() {
       )}
     </>
   );
-}
-
-// Small hook to access seek from audio hook without prop drilling
-import { useAudioSeek } from '../../hooks/useAudioSeek';
-function usePlayerSeek() {
-  return useAudioSeek();
 }

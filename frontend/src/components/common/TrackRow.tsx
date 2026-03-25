@@ -66,7 +66,7 @@ export default function TrackRow({
 
         {showArtwork && (
           <div className={styles.artwork}>
-            <ArtworkImage albumId={track.album_id} size={36} />
+            <ArtworkImage albumId={track.album_id} trackId={track.id} size={36} />
           </div>
         )}
 
